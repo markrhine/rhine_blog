@@ -1,0 +1,30 @@
+	
+	
+{% extends "base.html" %}
+
+{% block content13 %}
+	{% if blogPosts %}
+		{% for blog in blogPosts %}
+			{{blog.subject}}
+			<br>
+			<pre>{{blog.blogText}}</pre>
+			<br>
+			{{blog.timeCreated.strftime("%b %d, %Y  %H:%M:%S")}}
+		
+			<hr>
+			<br>
+			<br>
+			
+		{% endfor %}
+	
+	{% endif %}
+
+	<p>Last Queried {{timeSinceUpdate}} seconds ago<p>
+	
+	<form method="post">
+		<label>Submit a Post
+			<input type="hidden" name="wantsAdd" value="yes">
+		<input type="submit" value="Add New Post">
+	</form>
+
+{% endblock %}

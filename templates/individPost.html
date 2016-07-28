@@ -1,0 +1,22 @@
+
+{% extends "base.html" %}
+
+{% block content13 %}
+	<h3>{{subject}}</h3>
+	<br>
+	{{blogtext}}
+	<br>
+	{{time.strftime("%b %d, %Y  %H:%M:%S")}}
+	<br>
+	<br>
+	<p>Queried {{timeSinceUpdate}} seconds ago<p>
+
+	<form method="post">
+		<label>Go to Home Page
+			<input type="hidden" name="wantsAdd" value="yes">
+		<input type="submit" value="Go">
+	</form>
+
+
+
+{% endblock %}

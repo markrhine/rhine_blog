@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}
+
+{% block content13 %}
+
+
+	<h2>New User Registration</h2>
+
+	<form method="post">
+
+		<label>User Name:
+			<input type="text" name="username" value="{{cacheUN}}">
+		</label>
+		<div>{{userNameError}}</div>
+		<br/>
+		<label>Password:
+			<input type="password" name="password">
+		</label>
+		<div>{{passwrdError}}</div>
+		<br/>
+		<label>Confirm Password:
+			<input type="password" name="verify">
+		</label>
+		<div>{{confirmPWError}}</div>
+		<br/>
+		<label>Email (optional):
+			<input type="email" name="email" value="{{cacheEmail}}">
+		</label>
+		<div>{{emailError}}</div>
+		<br/>
+		<br/>
+		<input type="submit" value="Submit">
+
+
+	</form>
+
+{% endblock %}
