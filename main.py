@@ -122,7 +122,19 @@ class FrontHandler(Handler):
         #subtract time of redering front page,now, from time the cache of top 10
         #blog posts was last updated. Show in # seconds. Round it by converting float to int.
         timeSinceLastUpdate = int((datetime.now() - lastUpdate).total_seconds())
-        self.renderHtml("frontPage.html", blogPosts = blogs, timeSinceUpdate = timeSinceLastUpdate)
+        
+        #----------------------------------------------------------
+        #get the cookie from user with cookie name of "username"
+        #so we can let user know if they are logged in or ask to login, signup
+        UNCookieVal = self.request.cookies.get("username", "")
+        #the cookie value is in format "username|hashcode"
+        #take users cookie val and check to make sure it is valid.
+        userName = check_secure_val(UNCookieVal)
+        #if valid username hash: (cookie is authentic)
+        #---------------------------------------------------------------
+        self.renderHtml("frontPage.html", blogPosts = blogs, 
+                        timeSinceUpdate = timeSinceLastUpdate,
+                        username = userName)
         
     def post(self):
         #if user submits form (clicks the new post button) --> redirect to /newpost url
@@ -136,9 +148,24 @@ class FormHandler(Handler):
     """
     def get(self):
         
-        #render an empty form
-        self.renderHtml("formPage.html", subject="", blogtext="", error="")
-            
+        #if user is logged in, let him/her post, otherwise redirect to /login
+         #----------------------------------------------------------
+        #get the cookie from user with cookie name of "username"
+        #so we can personalize the welcome page for each inividual user
+        UNCookieVal = self.request.cookies.get("username", "")
+        #the cookie value is in format "username|hashcode"
+        #take users cookie val and check to make sure it is valid.
+        userName = check_secure_val(UNCookieVal)
+        
+        #if valid username hash: (cookie is authentic)
+        if userName:
+            #render an empty form
+            self.renderHtml("formPage.html", subject="", blogtext="", error="")
+
+        #if user has not logged in or if cookie is cheated:
+        else:
+            self.redirect('/login')
+        #-------------------------------------------------------------
             
     def post(self):
         
@@ -183,6 +210,15 @@ class AfterPostHandler(Handler):
     for after a user posts a new blog.
     """
     def get(self):
+        
+        #get the cookie from user with cookie name of "username"
+        #so we can let user know if they are logged in or ask to login, signup
+        UNCookieVal = self.request.cookies.get("username", "")
+        #the cookie value is in format "username|hashcode"
+        #take users cookie val and check to make sure it is valid.
+        userName = check_secure_val(UNCookieVal)        
+
+        
         #ag1zfnJoaW5lLWJsb2cychULEghCbG9nUG9zdBiAgICAvMuKCgw
         #get the url that you are at. Will be unique because the blog post primary key is part of url
         url = self.request.url
@@ -201,7 +237,8 @@ class AfterPostHandler(Handler):
         timeSinceLastCache = int((datetime.now() - lastUpdatePerm).total_seconds())
         #render the blog post to user, sending blog post attributes to template
         self.renderHtml("individPost.html", subject = thePost.subject, blogtext = thePost.blogText, 
-                        time = thePost.timeCreated, timeSinceUpdate = timeSinceLastCache)
+                        time = thePost.timeCreated, timeSinceUpdate = timeSinceLastCache,
+                        username = userName)
     
     def post(self):
         
@@ -357,7 +394,6 @@ class LoginHandler(Handler):
             
             
 
-
            
 class WelcomeHandler(Handler):
     """
@@ -393,7 +429,7 @@ class LogoutHandler(Handler):
             #self.response.delete_cookie("username") --> this works too
             self.response.set_cookie("username", None, path="/")
         #redirect user to signup page regardless of cookie
-        self.redirect("/signup")
+        self.redirect("/login")
 
 
 class FlushHandler(Handler):
@@ -647,6 +683,8 @@ def check_secure_val(cookieValue):
     ###checks to see if the actual cookie value is valid
     #cookieValue is a string in format "actualValue|hashOutput"
     #the actual value was the input into hash function to get hashOutput
+    if cookieValue == "":
+        return None
     y = cookieValue.split("|")
     actualVal = y[0]
     hashOutput = y[1]

@@ -2,6 +2,17 @@
 {% extends "base.html" %}
 
 {% block content13 %}
+
+	{% if username %}
+		<p>You are logged in, {{username}}<p>
+		<form action="/logout" method="get">
+		<button>Logout</button>
+		</form>
+	<br>
+
+	{% else %}
+		<p>Please <a href="/login">LogIn</a> or <a href='signup'>Sign-Up</a></p>
+	{% endif %}
 	<h3>{{subject}}</h3>
 	<br>
 	{{blogtext}}
@@ -16,6 +27,7 @@
 			<input type="hidden" name="wantsAdd" value="yes">
 		<input type="submit" value="Go">
 	</form>
+
 
 
 
